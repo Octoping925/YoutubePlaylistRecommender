@@ -2,7 +2,6 @@ package octoping.YoutubePlaylistRecommender.common.utility;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class HelperTest {
@@ -20,8 +19,8 @@ class HelperTest {
         String result3 = Helper.parseKorean(txt3);
 
         // then
-        Assertions.assertEquals(" ", result1);
-        Assertions.assertEquals("안녕 세상", result2);
-        Assertions.assertEquals("그 때 ㄱ나니", result3);
+        assertEquals(" ", result1);
+        assertEquals("안녕 세상", result2);
+        assertEquals("그 때 ㄱ나니", result3);
     }
 }
