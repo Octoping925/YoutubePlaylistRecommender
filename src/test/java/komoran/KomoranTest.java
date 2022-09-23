@@ -14,8 +14,10 @@ public class KomoranTest {
      * Komoran 공식 문서 : https://komorandocs.readthedocs.io/ko/latest/index.html
      */
 
-//    private final String playlistTitle = "한강이나 갈까? 편하게 입고 나와, 시원한 밤공기와 함께 틀어놓기 좋은 노래 모음";
-    private final String playlistTitle = "활력 충전!! 광란의 노동요 플레이리스트 | 신나는 집중력 향상 음악";
+    private final String playlistTitle
+//        = "한강이나 갈까? 편하게 입고 나와, 시원한 밤공기와 함께 틀어놓기 좋은 노래 모음";
+//        = "활력 충전!! 광란의 노동요 플레이리스트 | 신나는 집중력 향상 음악";
+        = "[Playlist] 아, 이 노래들은 진짜 알려주기 아까운데ㅣOh, I really don't want to tell you these songs";
     private final Komoran komoran = new Komoran(DEFAULT_MODEL.FULL);
     private final KomoranResult analyzeResultList = komoran.analyze(playlistTitle);
 
