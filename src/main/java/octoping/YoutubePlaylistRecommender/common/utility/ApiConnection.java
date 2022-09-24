@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
 import org.json.JSONObject;
 
 
@@ -23,7 +25,7 @@ public class ApiConnection {
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setDoOutput(true);
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
         StringBuilder sb = new StringBuilder();
         String line = null;
 
