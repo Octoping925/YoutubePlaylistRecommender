@@ -5,8 +5,6 @@ import octoping.YoutubePlaylistRecommender.common.config.ExceptionConstants;
 import octoping.YoutubePlaylistRecommender.domain.id.VideoSongId;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Getter

@@ -27,13 +27,21 @@ public class YoutubeAPIService implements YoutubeService {
             + "&id=" + videoId;
 
         JSONObject json = ApiConnection.getJson(apiUrl);
-        JSONObject snippet = (JSONObject)((JSONObject)((JSONArray) json.get("items")).get(0)).get("snippet");
+        JSONObject snippet = (JSONObject)((JSONObject)json.getJSONArray("items").get(0)).get("snippet");
 
-        String title = (String)snippet.get("title");
-        String description = (String)snippet.get("description");
-        String channelTitle = (String)snippet.get("channelTitle");
+        String title = snippet.getString("title");
+        String description = snippet.getString("description");
+        String channelTitle = snippet.getString("channelTitle");
+        List<String> tags = new ArrayList<String>();
 
-        return new PlaylistVO(title, description, channelTitle);
+        try {
+            snippet.getJSONArray("tags").forEach(tag -> tags.add((String) tag));
+        }
+        catch(Exception e) {
+            System.out.println("tag가 존재하지 않는 video");
+        }
+
+        return new PlaylistVO(title, description, channelTitle, tags);
     }
 
     public List<CommentVO> getYoutubeVideoComment(String videoId) throws IOException {
@@ -53,10 +61,10 @@ public class YoutubeAPIService implements YoutubeService {
             JSONObject snippet = (JSONObject) topLevelComment.get("snippet");
 
             // 타임라인이 없는 댓글은 무시한다
-            String textDisplay = (String) snippet.get("textDisplay");
+            String textDisplay = snippet.getString("textDisplay");
             if(textDisplay.contains("<a href=\"https://www.youtube.com/watch?")) {
-                String writer = (String) snippet.get("authorDisplayName");
-                String content = (String) snippet.get("textOriginal");
+                String writer = snippet.getString("authorDisplayName");
+                String content = snippet.getString("textOriginal");
                 vo.add(new CommentVO(writer, content));
             }
         });
