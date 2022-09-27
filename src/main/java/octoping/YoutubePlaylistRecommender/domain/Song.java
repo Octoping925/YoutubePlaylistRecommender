@@ -9,7 +9,7 @@ import java.util.Set;
 @Entity
 @Getter
 public class Song {
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long songId;
 
     @OneToMany(mappedBy = "videoSongId.song")
@@ -20,4 +20,9 @@ public class Song {
 
     String title;
     String artist;
+
+    public Song(String title, String artist) {
+        this.title = title;
+        this.artist = artist;
+    }
 }

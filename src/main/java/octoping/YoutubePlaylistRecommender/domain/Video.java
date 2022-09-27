@@ -1,6 +1,7 @@
 package octoping.YoutubePlaylistRecommender.domain;
 
 import lombok.Getter;
+import octoping.YoutubePlaylistRecommender.vo.PlaylistVO;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -22,4 +23,11 @@ public class Video {
 
     String title;
     String uploader;
+    String description;
+
+    public Video(PlaylistVO vo) {
+        this.title = vo.getTitle();
+        this.uploader = vo.getChannelTitle();
+        this.description = vo.getDescription();
+    }
 }
