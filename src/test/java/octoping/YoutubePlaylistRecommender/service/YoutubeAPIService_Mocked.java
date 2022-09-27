@@ -21,7 +21,13 @@ public class YoutubeAPIService_Mocked implements YoutubeService {
         String description = (String)snippet.get("description");
         String channelTitle = (String)snippet.get("channelTitle");
         List<String> tags = new ArrayList<String>();
-        ((JSONArray)snippet.get("tags")).forEach(tag -> tags.add((String) tag));
+        
+        try {
+            snippet.getJSONArray("tags").forEach(tag -> tags.add((String) tag));
+        }
+        catch(Exception e) {
+            System.out.println("tag가 존재하지 않는 video");
+        }
 
         return new PlaylistVO(title, description, channelTitle, tags);
     }
