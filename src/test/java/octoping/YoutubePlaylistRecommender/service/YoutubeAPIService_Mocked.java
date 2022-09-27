@@ -20,8 +20,10 @@ public class YoutubeAPIService_Mocked implements YoutubeService {
         String title = (String)snippet.get("title");
         String description = (String)snippet.get("description");
         String channelTitle = (String)snippet.get("channelTitle");
+        List<String> tags = new ArrayList<String>();
+        ((JSONArray)snippet.get("tags")).forEach(tag -> tags.add((String) tag));
 
-        return new PlaylistVO(title, description, channelTitle);
+        return new PlaylistVO(title, description, channelTitle, tags);
     }
 
     public List<CommentVO> getYoutubeVideoComment(String videoId) throws IOException {
