@@ -1,4 +1,4 @@
-package octoping.YoutubePlaylistRecommender.common.repository;
+package octoping.YoutubePlaylistRecommender.repository;
 
 import javax.persistence.EntityManager;
 

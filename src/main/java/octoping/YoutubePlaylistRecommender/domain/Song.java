@@ -16,7 +16,7 @@ public class Song {
     Set<VideoSong> videoSong = new HashSet<>();
 
     @OneToMany(mappedBy = "songKeywordId.song")
-    Set<SongKeyword> keywords = new HashSet<>();
+    Set<SongKeyword> songKeywords = new HashSet<>();
 
     String title;
     String artist;

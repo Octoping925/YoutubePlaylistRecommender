@@ -1,10 +1,13 @@
 package octoping.YoutubePlaylistRecommender.service;
 
 import java.io.IOException;
+import octoping.YoutubePlaylistRecommender.domain.SongKeyword;
+import octoping.YoutubePlaylistRecommender.domain.VideoKeyword;
+import octoping.YoutubePlaylistRecommender.domain.VideoSong;
 import octoping.YoutubePlaylistRecommender.vo.*;
-import octoping.YoutubePlaylistRecommender.common.repository.KeywordRepository;
-import octoping.YoutubePlaylistRecommender.common.repository.PlaylistRepository;
-import octoping.YoutubePlaylistRecommender.common.repository.SongRepository;
+import octoping.YoutubePlaylistRecommender.repository.KeywordRepository;
+import octoping.YoutubePlaylistRecommender.repository.PlaylistRepository;
+import octoping.YoutubePlaylistRecommender.repository.SongRepository;
 import octoping.YoutubePlaylistRecommender.common.utility.Helper;
 import octoping.YoutubePlaylistRecommender.common.utility.WordParser;
 import octoping.YoutubePlaylistRecommender.domain.Keyword;
@@ -35,18 +38,33 @@ public class PlaylistService {
         List<CommentVO> commentVO = youtubeService.getYoutubeVideoComment(videoId);
 
         // 동영상 정보 DB에 저장
-        Video video = new Video(playlistVO);
+        Video video = new Video(playlistVO, videoId);
         playlistRepository.save(video);
 
         // 노래 정보 DB에 저장
         Set<Song> songs = parseSongs(video.getDescription(), commentVO);
-        songs.forEach(song -> songRepository.save(song));
+        songs.forEach(songRepository::save);
 
         // 키워드 정보 DB에 저장
         Set<Keyword> keywords = parseKeywords(playlistVO);
-        keywords.forEach(keyword -> keywordRepository.save(keyword));
+        keywords.forEach(keywordRepository::save);
 
-        // 연관관계 저장
+        // 노래 연관관계 저장
+        songs.forEach(song -> {
+            VideoSong videoSong = new VideoSong(video, song);
+            playlistRepository.save(videoSong);
+        });
+
+        // 키워드 연관관계 저장
+        keywords.forEach(keyword -> {
+            VideoKeyword videoKeyword = new VideoKeyword(video, keyword);
+            keywordRepository.save(videoKeyword);
+
+            songs.forEach(song -> {
+                SongKeyword songKeyword = new SongKeyword(song, keyword);
+                keywordRepository.save(songKeyword);
+            });
+        });
     }
 
     private boolean isAlreadyCrawledPlaylist(String videoId) {

@@ -25,7 +25,8 @@ public class Video {
     String uploader;
     String description;
 
-    public Video(PlaylistVO vo) {
+    public Video(PlaylistVO vo, String videoId) {
+        this.videoId = videoId;
         this.title = vo.getTitle();
         this.uploader = vo.getChannelTitle();
         this.description = vo.getDescription();

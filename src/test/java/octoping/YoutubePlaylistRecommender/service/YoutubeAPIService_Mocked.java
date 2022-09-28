@@ -15,17 +15,17 @@ public class YoutubeAPIService_Mocked implements YoutubeService {
 
     public PlaylistVO getYoutubeVideoOverview(String videoId) {
         JSONObject json = new JSONObject(videoOverview);
-        JSONObject snippet = (JSONObject)((JSONObject)((JSONArray) json.get("items")).get(0)).get("snippet");
+        JSONObject snippet = json.getJSONArray("items").getJSONObject(0).getJSONObject("snippet");
 
-        String title = (String)snippet.get("title");
-        String description = (String)snippet.get("description");
-        String channelTitle = (String)snippet.get("channelTitle");
-        List<String> tags = new ArrayList<String>();
-        
-        try {
+        String title = snippet.getString("title");
+        String description = snippet.getString("description");
+        String channelTitle = snippet.getString("channelTitle");
+        List<String> tags = new ArrayList<>();
+
+        if(snippet.has("tags")) {
             snippet.getJSONArray("tags").forEach(tag -> tags.add((String) tag));
         }
-        catch(Exception e) {
+        else {
             System.out.println("tag가 존재하지 않는 video");
         }
 
@@ -36,16 +36,16 @@ public class YoutubeAPIService_Mocked implements YoutubeService {
         JSONObject json = new JSONObject(videoComment);
 
         List<CommentVO> vo = new ArrayList<>();
-        JSONArray items = (JSONArray) json.get("items");
+        JSONArray items = json.getJSONArray("items");
         items.forEach(item -> {
-            JSONObject topLevelComment = (JSONObject)((JSONObject)((JSONObject)item).get("snippet")).get("topLevelComment");
-            JSONObject snippet = (JSONObject) topLevelComment.get("snippet");
+            JSONObject topLevelComment = ((JSONObject) item).getJSONObject("snippet").getJSONObject("topLevelComment");
+            JSONObject snippet = topLevelComment.getJSONObject("snippet");
 
             // 타임라인이 없는 댓글은 무시한다
-            String textDisplay = (String) snippet.get("textDisplay");
+            String textDisplay = snippet.getString("textDisplay");
             if(textDisplay.contains("<a href=\"https://www.youtube.com/watch?")) {
-                String writer = (String) snippet.get("authorDisplayName");
-                String content = (String) snippet.get("textOriginal");
+                String writer = snippet.getString("authorDisplayName");
+                String content = snippet.getString("textOriginal");
                 vo.add(new CommentVO(writer, content));
             }
         });

@@ -18,6 +18,8 @@ public class VideoSong {
 
     public VideoSong(Video video, Song song) {
         this.videoSongId = new VideoSongId(video, song);
+        video.getVideoSongs().add(this);
+        song.getVideoSong().add(this);
     }
 
 }

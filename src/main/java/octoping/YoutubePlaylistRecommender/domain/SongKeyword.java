@@ -18,6 +18,8 @@ public class SongKeyword {
 
     public SongKeyword(Song song, Keyword keyword) {
         this.songKeywordId = new SongKeywordId(song, keyword);
+        song.getSongKeywords().add(this);
+        keyword.getSongKeywords().add(this);
     }
 
 }

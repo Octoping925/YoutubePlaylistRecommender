@@ -27,18 +27,19 @@ public class YoutubeAPIService implements YoutubeService {
             + "&id=" + videoId;
 
         JSONObject json = ApiConnection.getJson(apiUrl);
-        JSONObject snippet = (JSONObject)((JSONObject)json.getJSONArray("items").get(0)).get("snippet");
+        JSONObject snippet = json.getJSONArray("items").getJSONObject(0).getJSONObject("snippet");
 
+        return parsePlaylistVOFromSnippet(snippet);
+    }
+
+    private PlaylistVO parsePlaylistVOFromSnippet(JSONObject snippet) {
         String title = snippet.getString("title");
         String description = snippet.getString("description");
         String channelTitle = snippet.getString("channelTitle");
-        List<String> tags = new ArrayList<String>();
+        List<String> tags = new ArrayList<>();
 
-        try {
+        if(snippet.has("tags")) {
             snippet.getJSONArray("tags").forEach(tag -> tags.add((String) tag));
-        }
-        catch(Exception e) {
-            System.out.println("tag가 존재하지 않는 video");
         }
 
         return new PlaylistVO(title, description, channelTitle, tags);
@@ -53,12 +54,18 @@ public class YoutubeAPIService implements YoutubeService {
             + "&videoId=" + videoId
             + "&maxResults=" + maxResults;
 
-        List<CommentVO> vo = new ArrayList<>();
         JSONObject json = ApiConnection.getJson(apiUrl);
-        JSONArray items = (JSONArray) json.get("items");
+        JSONArray items = json.getJSONArray("items");
+
+        return parseCommentVOsFromItems(items);
+    }
+
+    private List<CommentVO> parseCommentVOsFromItems(JSONArray items) {
+        List<CommentVO> vo = new ArrayList<>();
+
         items.forEach(item -> {
-            JSONObject topLevelComment = (JSONObject)((JSONObject)((JSONObject)item).get("snippet")).get("topLevelComment");
-            JSONObject snippet = (JSONObject) topLevelComment.get("snippet");
+            JSONObject topLevelComment = ((JSONObject) item).getJSONObject("snippet").getJSONObject("topLevelComment");
+            JSONObject snippet = topLevelComment.getJSONObject("snippet");
 
             // 타임라인이 없는 댓글은 무시한다
             String textDisplay = snippet.getString("textDisplay");

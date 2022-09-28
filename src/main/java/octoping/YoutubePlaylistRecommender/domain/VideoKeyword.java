@@ -18,5 +18,7 @@ public class VideoKeyword {
 
      public VideoKeyword(Video video, Keyword keyword) {
          this.videoKeywordId = new VideoKeywordId(video, keyword);
+         video.getVideoKeywords().add(this);
+         keyword.getVideoKeywords().add(this);
      }
 }

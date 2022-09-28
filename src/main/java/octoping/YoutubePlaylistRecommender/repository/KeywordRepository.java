@@ -1,7 +1,9 @@
-package octoping.YoutubePlaylistRecommender.common.repository;
+package octoping.YoutubePlaylistRecommender.repository;
 
 import javax.persistence.EntityManager;
 
+import octoping.YoutubePlaylistRecommender.domain.SongKeyword;
+import octoping.YoutubePlaylistRecommender.domain.VideoKeyword;
 import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,14 @@ public class KeywordRepository {
 
     public void save(Keyword keyword) {
         em.persist(keyword);
+    }
+
+    public void save(VideoKeyword videoKeyword) {
+        em.persist(videoKeyword);
+    }
+
+    public void save(SongKeyword songKeyword) {
+        em.persist(songKeyword);
     }
 
     public Keyword findOne(Long keywordId) {
