@@ -25,6 +25,8 @@ public class Video {
     String uploader;
     String description;
 
+    protected Video(){}
+
     public Video(PlaylistVO vo, String videoId) {
         this.videoId = videoId;
         this.title = vo.getTitle();

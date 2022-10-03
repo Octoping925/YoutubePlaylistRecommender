@@ -7,4 +7,13 @@
   <select id="getPlaylists" resultType="HashMap">
     SELECT * FROM VIDEO
   </select>
+
+  <select id="searchPlaylistsBySong" parameterType="hashMap" resultType="HashMap">
+    SELECT *
+    FROM VIDEO
+    WHERE videoId IN
+          (SELECT DISTINCT videoId
+           FROM VIDEOSONG
+           WHERE songId = #{P_SONGID});
+  </select>
 </mapper>
