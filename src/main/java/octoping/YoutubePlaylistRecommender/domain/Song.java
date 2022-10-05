@@ -21,8 +21,19 @@ public class Song {
     String title;
     String artist;
 
+    protected Song() {}
+
     public Song(String title, String artist) {
         this.title = title;
         this.artist = artist;
+    }
+
+    /**
+     * 가수와 노래 제목이 거꾸로 들어갔을 경우 스위칭
+     */
+    public void switchTitleAndArtist() {
+        String tmp = title;
+        title = artist;
+        artist = tmp;
     }
 }

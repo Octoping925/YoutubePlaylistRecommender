@@ -24,6 +24,8 @@ public class Keyword {
 
     String keyword;
 
+    protected Keyword() {}
+
     public Keyword(String keyword) {
         this.keyword = keyword;
     }

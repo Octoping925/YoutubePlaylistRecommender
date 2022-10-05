@@ -72,27 +72,48 @@ public class PlaylistService {
     }
     
     private Set<Song> parseSongs(String videoDescription, List<CommentVO> commentVOs) {
-        Set<Song> songList = new HashSet<>();
-        songList.addAll(parseSongsFromVideoDescription(videoDescription));
-        songList.addAll(parseSongsFromComments(commentVOs));
-        return songList;
+        Set<Song> songs = parseSongsFromVideoDescription(videoDescription);
+        List<Set<Song>> songListFromComments = parseSongsFromComments(commentVOs);
+
+        for(Set<Song> songList : songListFromComments) {
+            if(songList.size() > songs.size()) {
+                songs = songList;
+            }
+        }
+
+        return songs;
     }
 
     private Set<Song> parseSongsFromVideoDescription(String videoDescription) {
-        // TODO: 로직 추가
-        Set<Song> songList = new HashSet<>();
-
-
-        return songList;
+        return getSongsFromText(videoDescription);
     }
 
-    private Set<Song> parseSongsFromComments(List<CommentVO> commentVOs) {
-        // TODO: 로직 추가
-        for(CommentVO vo : commentVOs) {
+    private List<Set<Song>> parseSongsFromComments(List<CommentVO> commentVOs) {
+        return commentVOs.stream()
+                .map(vo -> getSongsFromText(vo.getContent()))
+                .toList();
+    }
 
-        }
-        
+    private Set<Song> getSongsFromText(String text) {
         Set<Song> songList = new HashSet<>();
+        String[] textLine = text.split("\n");
+
+        String beforeTimeLine = null;
+        for(String line : textLine) {
+            String[] splitArr = line.split("\\d\\d(:\\d\\d)+");
+            if(splitArr.length > 1) {
+                String songInfo = splitArr[splitArr.length - 1];
+                String timeline = line.substring(0, line.indexOf(songInfo));
+
+                if(beforeTimeLine != null && !beforeTimeLine.equals(timeline)) {
+                    String[] songInfoSplitArr = songInfo.split("-");
+                    songList.add(new Song(songInfoSplitArr[1].trim(), songInfoSplitArr[0].trim()));
+                }
+
+                beforeTimeLine = timeline;
+            }
+        }
+
         return songList;
     }
 
