@@ -15,7 +15,8 @@ public class KeywordRepository {
     private final EntityManager em;
 
     public void save(Keyword keyword) {
-        em.persist(keyword);
+        if(findOne(keyword.getKeyword()) == null)
+            em.persist(keyword);
     }
 
     public void save(VideoKeyword videoKeyword) {
@@ -26,8 +27,8 @@ public class KeywordRepository {
         em.persist(songKeyword);
     }
 
-    public Keyword findOne(Long keywordId) {
-        return em.find(Keyword.class, keywordId);
+    public Keyword findOne(String keyword) {
+        return em.find(Keyword.class, keyword);
     }
     
 }

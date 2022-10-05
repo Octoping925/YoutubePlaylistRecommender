@@ -13,16 +13,14 @@ import java.util.Set;
 @Entity
 @Getter
 public class Keyword {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long keywordId;
+    @Id
+    String keyword;
 
     @OneToMany(mappedBy = "videoKeywordId.keyword")
     Set<VideoKeyword> videoKeywords = new HashSet<>();
 
     @OneToMany(mappedBy = "songKeywordId.keyword")
     Set<SongKeyword> songKeywords = new HashSet<>();
-
-    String keyword;
 
     protected Keyword() {}
 
