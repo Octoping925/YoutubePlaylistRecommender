@@ -1,6 +1,8 @@
 package octoping.YoutubePlaylistRecommender.service;
 
 import java.io.IOException;
+
+import octoping.YoutubePlaylistRecommender.common.config.KeywordConfig;
 import octoping.YoutubePlaylistRecommender.domain.SongKeyword;
 import octoping.YoutubePlaylistRecommender.domain.VideoKeyword;
 import octoping.YoutubePlaylistRecommender.domain.VideoSong;
@@ -28,6 +30,7 @@ public class PlaylistService {
     private final PlaylistRepository playlistRepository;
     private final SongRepository songRepository;
     private final KeywordRepository keywordRepository;
+    private final KeywordConfig keywordConfig;
 
     @Transactional
     public void crawl(String videoId) throws IOException {
@@ -123,8 +126,9 @@ public class PlaylistService {
         keywords.addAll(parseKeywordsFromVideoTags(vo.getTags()));
         
         return keywords.stream()
-            .map(Keyword::new)
-            .collect(Collectors.toSet());
+                .filter(keyword -> !keywordConfig.isContainExcludeList(keyword))
+                .map(Keyword::new)
+                .collect(Collectors.toSet());
     }
 
     private Set<String> parseKeywordsFromVideoTitle(String videoTitle) {
