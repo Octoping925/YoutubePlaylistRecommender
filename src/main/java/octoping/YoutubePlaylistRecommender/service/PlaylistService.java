@@ -109,7 +109,7 @@ public class PlaylistService {
                 String timeline = line.substring(0, line.indexOf(songInfo));
 
                 if(beforeTimeLine != null && !beforeTimeLine.equals(timeline)) {
-                    String[] songInfoSplitArr = songInfo.split("-");
+                    String[] songInfoSplitArr = songInfo.split("-", 2);
                     songList.add(new Song(songInfoSplitArr[1].trim(), songInfoSplitArr[0].trim()));
                 }
 
