@@ -19,4 +19,12 @@ public class SongRepository {
     public Song findOne(Long songId) {
         return em.find(Song.class, songId);
     }
+
+    public boolean chkExist(String title, String artist) {
+        return !em.createQuery("SELECT s FROM Song s WHERE s.title = :title AND s.artist = :artist", Song.class)
+                .setParameter("title", title)
+                .setParameter("artist", artist)
+                .getResultList()
+                .isEmpty();
+    }
 }
