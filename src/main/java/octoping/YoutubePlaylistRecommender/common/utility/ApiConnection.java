@@ -1,13 +1,12 @@
 package octoping.YoutubePlaylistRecommender.common.utility;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-
+import java.util.HashMap;
 import org.json.JSONObject;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.reactive.function.client.WebClient;
 
 
 public class ApiConnection {
@@ -17,23 +16,28 @@ public class ApiConnection {
      * @param apiUrl API 통신을 보낼 URI
      * @return API 통신 결과 JSONObject
      */
-    public static JSONObject getJson(String apiUrl) throws IOException {
-        URL url = new URL(apiUrl);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    public static JSONObject getJson(String apiUrl) {
+        WebClient webClient = makeWebClient(apiUrl);
 
-        conn.setRequestMethod("GET");
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setDoOutput(true);
+        ResponseEntity<HashMap> block = webClient.get()
+                                                .retrieve()
+                                                .onStatus(HttpStatus::is4xxClientError, response -> {
+                                                    throw new IllegalStateException("WebClient Connection Failed, apiUrl = " + apiUrl);
+                                                })
+                                                .onStatus(HttpStatus::is5xxServerError, response -> {
+                                                    throw new IllegalStateException("WebClient Server Error, apiUrl = " + apiUrl);
+                                                })
+                                                .toEntity(HashMap.class)
+                                                .block();
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
+        return new JSONObject(block.getBody());
+    }
 
-        while((line = br.readLine()) != null) {
-            sb.append(line);
-        }
-
-        return new JSONObject(sb.toString());
+    private static WebClient makeWebClient(String apiUrl) {
+        return WebClient.builder()
+            .baseUrl(apiUrl)
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .build();
     }
 
 }
