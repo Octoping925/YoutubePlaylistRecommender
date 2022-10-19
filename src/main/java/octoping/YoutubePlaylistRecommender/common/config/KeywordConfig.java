@@ -17,13 +17,13 @@ import java.util.Set;
 public class KeywordConfig {
     @Value("${file.keyword-exclude-list.path}")
     String keywordExcludeListPath;
+
     private final Set<String> keywordExcludeList = new HashSet<>();
 
     @PostConstruct
     private void getKeywordExcludeListFromList() {
         try (BufferedReader br = new BufferedReader(new FileReader(keywordExcludeListPath))){
-            String keyword;
-            while((keyword = br.readLine()) != null) {
+            for(String keyword; (keyword = br.readLine()) != null;) {
                 keywordExcludeList.add(keyword);
             }
         }

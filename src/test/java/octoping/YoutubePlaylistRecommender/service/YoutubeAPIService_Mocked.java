@@ -15,7 +15,7 @@ public class YoutubeAPIService_Mocked implements YoutubeService {
 
     public PlaylistVO getYoutubeVideoOverview(String videoId) {
         JSONObject json = new JSONObject(videoOverview);
-        JSONObject snippet = json.getJSONArray("items").getJSONObject(0).getJSONObject("snippet");
+        JSONObject snippet = (JSONObject) json.query("/items/0/snippet");
 
         String title = snippet.getString("title");
         String description = snippet.getString("description");
@@ -38,8 +38,7 @@ public class YoutubeAPIService_Mocked implements YoutubeService {
         List<CommentVO> vo = new ArrayList<>();
         JSONArray items = json.getJSONArray("items");
         items.forEach(item -> {
-            JSONObject topLevelComment = ((JSONObject) item).getJSONObject("snippet").getJSONObject("topLevelComment");
-            JSONObject snippet = topLevelComment.getJSONObject("snippet");
+            JSONObject snippet = (JSONObject) ((JSONObject) item).query("/snippet/topLevelComment/snippet");
 
             // 타임라인이 없는 댓글은 무시한다
             String textDisplay = snippet.getString("textDisplay");
