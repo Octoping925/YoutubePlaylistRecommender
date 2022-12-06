@@ -1,5 +1,6 @@
 package octoping.YoutubePlaylistRecommender.repository;
 
+import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
@@ -24,5 +25,16 @@ public class PlaylistRepository {
 
     public Optional<Video> findOne(String videoId) {
         return Optional.ofNullable(em.find(Video.class, videoId));
+    }
+
+    public List<Video> findRandomPlaylists(int maxCount) {
+        return em.createQuery("SELECT v FROM Video v ORDER BY RAND()", Video.class)
+                .setMaxResults(maxCount)
+                .getResultList();
+    }
+
+    public Long getCountOfAllPlaylist() {
+        return em.createQuery("SELECT COUNT(v) FROM Video v", Long.class)
+                .getSingleResult();
     }
 }
