@@ -1,27 +1,28 @@
 package octoping.YoutubePlaylistRecommender.service;
 
 import java.io.IOException;
-
+import java.util.HashSet;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import octoping.YoutubePlaylistRecommender.common.config.KeywordConfig;
-import octoping.YoutubePlaylistRecommender.domain.SongKeyword;
-import octoping.YoutubePlaylistRecommender.domain.VideoKeyword;
-import octoping.YoutubePlaylistRecommender.domain.VideoSong;
-import octoping.YoutubePlaylistRecommender.vo.*;
-import octoping.YoutubePlaylistRecommender.repository.KeywordRepository;
-import octoping.YoutubePlaylistRecommender.repository.PlaylistRepository;
-import octoping.YoutubePlaylistRecommender.repository.SongRepository;
 import octoping.YoutubePlaylistRecommender.common.utility.Helper;
 import octoping.YoutubePlaylistRecommender.common.utility.WordParser;
 import octoping.YoutubePlaylistRecommender.domain.Keyword;
 import octoping.YoutubePlaylistRecommender.domain.Song;
+import octoping.YoutubePlaylistRecommender.domain.SongKeyword;
 import octoping.YoutubePlaylistRecommender.domain.Video;
-import java.util.*;
-import java.util.stream.Collectors;
-
+import octoping.YoutubePlaylistRecommender.domain.VideoKeyword;
+import octoping.YoutubePlaylistRecommender.domain.VideoSong;
+import octoping.YoutubePlaylistRecommender.repository.KeywordRepository;
+import octoping.YoutubePlaylistRecommender.repository.PlaylistRepository;
+import octoping.YoutubePlaylistRecommender.repository.SongRepository;
+import octoping.YoutubePlaylistRecommender.vo.CommentVO;
+import octoping.YoutubePlaylistRecommender.vo.PlaylistVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -71,9 +72,9 @@ public class PlaylistService {
     }
 
     private boolean isAlreadyCrawledPlaylist(String videoId) {
-        return playlistRepository.findOne(videoId) != null;
+        return playlistRepository.findOne(videoId).isPresent();
     }
-    
+
     private Set<Song> parseSongs(String videoDescription, List<CommentVO> commentVOs) {
         Set<Song> songs = parseSongsFromVideoDescription(videoDescription);
         List<Set<Song>> songListFromComments = parseSongsFromComments(commentVOs);
@@ -104,17 +105,22 @@ public class PlaylistService {
         String beforeTimeLine = null;
         for(String line : textLine) {
             String[] splitArr = line.split("\\d\\d(:\\d\\d)+");
-            if(splitArr.length > 1) {
-                String songInfo = splitArr[splitArr.length - 1];
-                String timeline = line.substring(0, line.indexOf(songInfo));
+            if(splitArr.length <= 1) continue;
 
-                if(beforeTimeLine != null && !beforeTimeLine.equals(timeline)) {
-                    String[] songInfoSplitArr = songInfo.split("-", 2);
-                    songList.add(new Song(songInfoSplitArr[1].trim(), songInfoSplitArr[0].trim()));
+            String songInfo = splitArr[splitArr.length - 1];
+            String timeline = line.substring(0, line.indexOf(songInfo));
+
+            if(beforeTimeLine != null && !beforeTimeLine.equals(timeline)) {
+                String[] songInfoSplitArr = songInfo.split("-", 2);
+                if(songInfoSplitArr.length == 1) {
+                    songList.add(Song.create(songInfoSplitArr[0].trim()));
                 }
-
-                beforeTimeLine = timeline;
+                else {
+                    songList.add(Song.create(songInfoSplitArr[1].trim(), songInfoSplitArr[0].trim()));
+                }
             }
+
+            beforeTimeLine = timeline;
         }
 
         return songList;
@@ -124,7 +130,7 @@ public class PlaylistService {
         Set<String> keywords = new HashSet<>();
         keywords.addAll(parseKeywordsFromVideoTitle(vo.getTitle()));
         keywords.addAll(parseKeywordsFromVideoTags(vo.getTags()));
-        
+
         return keywords.stream()
                 .filter(keyword -> !keywordConfig.isContainExcludeList(keyword))
                 .map(Keyword::new)
@@ -134,12 +140,15 @@ public class PlaylistService {
     private Set<String> parseKeywordsFromVideoTitle(String videoTitle) {
         String koreanTitle = Helper.parseKorean(videoTitle);
         List<String> nouns = WordParser.getNoun(koreanTitle);
-        return new HashSet<>(nouns);
+        return Set.copyOf(nouns);
     }
 
     private Set<String> parseKeywordsFromVideoTags(List<String> tags) {
-        return new HashSet<>(tags);
+        return Set.copyOf(tags);
     }
 
-
+    public Video getPlaylistByVideoId(String videoId) {
+        return playlistRepository.findOne(videoId)
+            .orElseThrow(() -> new NoSuchElementException("해당 플레이리스트가 존재하지 않습니다."));
+    }
 }

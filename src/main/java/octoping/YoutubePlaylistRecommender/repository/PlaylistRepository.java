@@ -1,5 +1,6 @@
 package octoping.YoutubePlaylistRecommender.repository;
 
+import java.util.Optional;
 import javax.persistence.EntityManager;
 
 import octoping.YoutubePlaylistRecommender.domain.VideoSong;
@@ -21,7 +22,7 @@ public class PlaylistRepository {
         em.persist(videoSong);
     }
 
-    public Video findOne(String videoId) {
-        return em.find(Video.class, videoId);
+    public Optional<Video> findOne(String videoId) {
+        return Optional.ofNullable(em.find(Video.class, videoId));
     }
 }
